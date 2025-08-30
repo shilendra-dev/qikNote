@@ -1,4 +1,5 @@
 import { z } from "zod";
+import 'dotenv/config';
 
 // Schema
 const envSchema = z.object({
@@ -7,14 +8,14 @@ const envSchema = z.object({
     HOST: z.string().default('0.0.0.0'),
 });
 
-// Helper
-const getEnvValue = <T>(values: { development?: T; production?: T; test?: T }, fallback: T): T => {
-    const env = (process.env.NODE_ENV as "development" | "production" | "test") || "development";
+// Get environment-specific values
+const getEnvValue = <T>(values: { development?: T; test?: T; production?: T }, fallback: T): T => {
+    const env = process.env.NODE_ENV as 'development' | 'test' | 'production';
     return values[env] ?? fallback;
 };
 
 // Parse env
-const parsedEnv = () => {
+const parseEnv = () => {
     try {
         const env = envSchema.parse(process.env);
         return {
@@ -63,7 +64,7 @@ const parsedEnv = () => {
                 .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
                 .join('\n');
 
-            console.error('❌ Invalid environment variables:\n', issues);
+            console.error('Invalid environment variables:\n', issues);
             process.exit(1);
         }
         throw error;
@@ -71,7 +72,7 @@ const parsedEnv = () => {
 };
 
 // Export validated config
-export const config = parsedEnv();
+export const config = parseEnv();
 
 // Export inferred type for use elsewhere
 export type Config = typeof config;
