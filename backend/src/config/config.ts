@@ -6,6 +6,13 @@ const envSchema = z.object({
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
     PORT: z.string().transform(Number).default(4000),
     HOST: z.string().default('0.0.0.0'),
+
+    DATABASE_URL: z.string().optional(),
+    DB_HOST: z.string().default('localhost'),
+    DB_PORT: z.string().transform(Number).default(5434),
+    DB_NAME: z.string().default('quikNote_db'),
+    DB_USER: z.string().default('quikNote_user'),
+    DB_PASSWORD: z.string().default('quikNote_password'),
 });
 
 // Get environment-specific values
@@ -23,6 +30,16 @@ const parseEnv = () => {
                 port: env.PORT,
                 host: env.HOST,
                 environment: env.NODE_ENV,
+            },
+            database: {
+                url:
+                    env.DATABASE_URL ||
+                    `postgresql://${env.DB_USER}:${env.DB_PASSWORD}@${env.DB_HOST}:${env.DB_PORT}/${env.DB_NAME}`,
+                host: env.DB_HOST,
+                port: env.DB_PORT,
+                name: env.DB_NAME,
+                user: env.DB_USER,
+                password: env.DB_PASSWORD,
             },
             security: {
                 helmet: {
