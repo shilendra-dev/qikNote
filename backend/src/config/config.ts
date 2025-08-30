@@ -15,7 +15,7 @@ const getEnvValue = <T>(values: { development?: T; production?: T; test?: T }, f
 
 // Parse env
 const parsedEnv = () => {
-    try{
+    try {
         const env = envSchema.parse(process.env);
         return {
             server: {
@@ -41,31 +41,43 @@ const parsedEnv = () => {
                     ),
                 },
                 cors: {
-                    
+                    origin: getEnvValue(
+                        {
+                            development: ['http://localhost:4000', 'http://localhost:5000'] as string[] | boolean,
+                            test: false as string[] | boolean,
+                            production: ['https://qiknote.pro', 'https://app.qiknote.pro'] as string[] | boolean,
+                        },
+                        false as string[] | boolean,
+                    ),
+                    credentials: true,
+                },
+                rateLimit: {
+                    max: getEnvValue({ development: 10000, test: 1000, production: 5000 }, 5000),
+                    timeWindow: '15 minutes' as const,
                 }
             },
         }
-    }catch (error) {
+    } catch (error) {
         if (error instanceof z.ZodError) {
-          const issues = error.issues
-            .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
-            .join('\n');
-    
-          console.error('❌ Invalid environment variables:\n', issues);
-          process.exit(1);
+            const issues = error.issues
+                .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
+                .join('\n');
+
+            console.error('❌ Invalid environment variables:\n', issues);
+            process.exit(1);
         }
         throw error;
-      }
-    };
-    
-    // Export validated config
-    export const config = parsedEnv();
-    
-    // Export inferred type for use elsewhere
-    export type Config = typeof config;
-    
-    // Helper to check environment
-    export const isDevelopment = config.server.environment === 'development';
-    export const isProduction = config.server.environment === 'production';
-    export const isTest = config.server.environment === 'test';
-    
+    }
+};
+
+// Export validated config
+export const config = parsedEnv();
+
+// Export inferred type for use elsewhere
+export type Config = typeof config;
+
+// Helper to check environment
+export const isDevelopment = config.server.environment === 'development';
+export const isProduction = config.server.environment === 'production';
+export const isTest = config.server.environment === 'test';
+
