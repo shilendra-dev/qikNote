@@ -7,10 +7,11 @@ export async function buildServer(){
         logger: false, //we will use our custom logger
         disableRequestLogging: true,
     })
-
     //register all plugins
     await registerPlugins(fastify);
 
     //register all routes
-    await fastify.register(registerRoutes());
+    await fastify.register(registerRoutes);
+
+    return fastify;
 }

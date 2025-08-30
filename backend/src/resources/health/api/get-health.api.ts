@@ -1,6 +1,7 @@
 import type { TypedFastifyInstance } from "@/types/fastify.js";
+import { Response } from "@/lib/response/response.js";
 
-export async function getHealth(fastify: TypedFastifyInstance) {
+export async function getHealthAPI(fastify: TypedFastifyInstance) {
     fastify.get(
         '/health',
         {
@@ -16,7 +17,7 @@ export async function getHealth(fastify: TypedFastifyInstance) {
                 uptime: process.uptime(),
                 environment: process.env.NODE_ENV || 'development',
             }
-            return Response.success(health, 'Service is healthy')
+            return Response.success(health, "Service is healthy", 200)
         },
     )
 }
