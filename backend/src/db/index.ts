@@ -1,6 +1,7 @@
 import { config } from "#src/config/config"
+import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import { drizzle } from "drizzle-orm/postgres-js";
 
 const pool = new Pool({
     connectionString: config.database.url,

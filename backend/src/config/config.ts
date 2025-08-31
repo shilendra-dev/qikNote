@@ -13,6 +13,13 @@ const envSchema = z.object({
     DB_NAME: z.string().default('quikNote_db'),
     DB_USER: z.string().default('quikNote_user'),
     DB_PASSWORD: z.string().default('quikNote_password'),
+
+    BETTER_AUTH_SECRET: z.string().default('must be 32'),
+    BETTER_AUTH_URL: z.string().default('http://localhost:5173'),
+
+    FRONTEND_URL: z.string().default('http://localhost:5173'),
+    GOOGLE_CLIENT_ID: z.string().default(''),
+    GOOGLE_CLIENT_SECRET: z.string().default(''),
 });
 
 // Get environment-specific values
@@ -72,7 +79,16 @@ const parseEnv = () => {
                 rateLimit: {
                     max: getEnvValue({ development: 10000, test: 1000, production: 5000 }, 5000),
                     timeWindow: '15 minutes' as const,
-                }
+                },
+                auth: {
+                    secret: env.BETTER_AUTH_SECRET,
+                    baseURL: `http://${env.HOST === '0.0.0.0' ? 'localhost' : env.HOST}:${env.PORT}`,
+                    frontendURL: env.FRONTEND_URL,
+                    google: {
+                      clientId: env.GOOGLE_CLIENT_ID,
+                      clientSecret: env.GOOGLE_CLIENT_SECRET,
+                    },
+                },
             },
         }
     } catch (error) {
